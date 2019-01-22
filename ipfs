@@ -44,7 +44,7 @@ ismounted() {
 domount() {
 	MNTPATH=$1
 
-	NFS_SERVER=$(echo $2 | jq -r '.server')
+	IPFS_SERVER=$(echo $2 | jq -r '.server')
 	SHARE=$(echo $2 | jq -r '.share')
 
 	if [ $(ismounted) -eq 1 ] ; then
@@ -71,9 +71,10 @@ unmount() {
 	fi
 
 	umount ${MNTPATH} &> /dev/null
-	IPFS_CMD_OUTPUT=$(ipfs mount -f ${MNTPATH})
+	UMOUNT_CMD_OUTPUT=$(umount -f ${MNTPATH})
+	
 	if [ $? -ne 0 ]; then
-		err "{ \"status\": \"Failed\", \"message\": \"Failed to unmount volume at ${MNTPATH}: ${IPFS_CMD_OUTPUT}\"}"
+		err "{ \"status\": \"Failed\", \"message\": \"Failed to unmount volume at ${MNTPATH}: ${UMOUNT_CMD_OUTPUT}\"}"
 		exit 1
 	fi
 
@@ -97,7 +98,7 @@ if [ "$op" = "init" ]; then
 	mkdir /ipfs /ipns
    chown $(whoami) /ipfs /ipns
    ipfs daemon &> /dev/null &
-	log '{"status": "Success", "capabilities": {"attach": false}}'
+	log '{"status": "Success", "capabilities": {"attach": true}}'
 	exit 0
 fi
 
